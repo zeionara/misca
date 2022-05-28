@@ -14,7 +14,8 @@ def main():
 @click.option('--theater', '-t', type = int, default = None)
 @click.option('--ndays', '-n', type = int, default = 0)
 def trace_schedule(max_price: int, movie: str, theater: int, ndays: int):
-    trace_schedule_(max_price, movie, theater, ndays)
+    for session in trace_schedule_(max_price, movie, theater, ndays):
+        print(session)
 
 
 if __name__ == '__main__':

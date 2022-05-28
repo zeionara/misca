@@ -48,4 +48,4 @@ def trace_schedule(max_price: float = None, movie: str = None, theater: int = No
         ) and (
             theater is None or session.theater.id == theater
         ):
-            print(session)
+            yield session
