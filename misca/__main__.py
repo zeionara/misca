@@ -1,6 +1,6 @@
 import math
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 import click
 import urllib.request
 from bs4 import BeautifulSoup
@@ -12,6 +12,7 @@ def main():
 
 
 DATE_TIME_PATTERN = '%d.%m.%Y.%H:%M'
+DATE_PATTERN = '%d.%m.%Y'
 THEATER_ID_PATTERN = re.compile('/spb/cinema/([0-9]+)/')
 
 
@@ -44,7 +45,7 @@ class MovieSession:
 
     def __str__(self):
         # return f'{self.title} @ {self.room} 📅 {self.__date_as_string} 🕑 {self.__time_as_string} 💰 {self.mean_price}'
-        return f'{self.title:<50} 🌎 {str(self.theater):<50} @ {self.room:<20} 📅 {self.__date_as_string} 🕑 {self.__time_as_string} 💰 {", ".join(map(str, self.prices))}'
+        return f'{self.title:<50} 🌎 {str(self.theater):<50} @ {self.room:<20} 📅 {self.__date_as_string} {"(" + self.time.strftime("%A") + ")":<10} 🕑 {self.__time_as_string} 💰 {", ".join(map(str, self.prices))}'
 
     def __repr__(self):
         return self.__str__()
@@ -73,33 +74,46 @@ class MovieTheater:
 @click.option('--max-price', '-xp', type = int, default = None)
 @click.option('--movie', '-m', type = str, default = None)
 @click.option('--theater', '-t', type = int, default = None)
-def print_hello_world(max_price: int, movie: str, theater: int):
-    date_as_string = '29.05.2022'
+@click.option('--ndays', '-n', type = int, default = 0)
+def print_hello_world(max_price: int, movie: str, theater: int, ndays: int):
+    assert ndays < 5, 'Cannot look 5 or more days ahead'
 
-    url = f'https://www.mirage.ru/spb/schedule/{date_as_string}/'
+    now = datetime.now()
 
-    response = urllib.request.urlopen(url)
-    html_content = response.read().decode('utf-8')
-    parsed_page = BeautifulSoup(html_content, 'html.parser')
+    dates = [datetime.now()]
 
-    # print(len(parsed_page.find_all('div', {'class': 'session'})))
+    for i in range(1, ndays + 1):
+        dates.append(now + timedelta(days = i))
 
-    # sessions = [MovieSession(session, date_as_string) for session in parsed_page.find_all('div', {'class': 'session'})]
+    dates_as_string = [date.strftime(DATE_PATTERN) for date in dates]
 
-    sessions_container = parsed_page.find_all('div', {'class': 'session-box'})[0]
-
-    current_movie_theater = None
+    # date_as_string = '29.05.2022'
 
     sessions = []
 
-    for element in sessions_container.find_all('div', recursive = False):
-        element_class = element['class'][0]
-        if element_class == 'md-title':
-            current_movie_theater = MovieTheater(element)
-        elif element_class == 'adds':
-            current_movie_theater.setup_address(element)
-        elif element_class == 'session-slider':
-            sessions.extend(MovieSession(session, date_as_string, current_movie_theater) for session in element.find_all('div', {'class': 'session'}))
+    for date_as_string in dates_as_string:
+        url = f'https://www.mirage.ru/spb/schedule/{date_as_string}/'
+
+        response = urllib.request.urlopen(url)
+        html_content = response.read().decode('utf-8')
+        parsed_page = BeautifulSoup(html_content, 'html.parser')
+
+        # print(len(parsed_page.find_all('div', {'class': 'session'})))
+
+        # sessions = [MovieSession(session, date_as_string) for session in parsed_page.find_all('div', {'class': 'session'})]
+
+        sessions_container = parsed_page.find_all('div', {'class': 'session-box'})[0]
+
+        current_movie_theater = None
+
+        for element in sessions_container.find_all('div', recursive = False):
+            element_class = element['class'][0]
+            if element_class == 'md-title':
+                current_movie_theater = MovieTheater(element)
+            elif element_class == 'adds':
+                current_movie_theater.setup_address(element)
+            elif element_class == 'session-slider':
+                sessions.extend(MovieSession(session, date_as_string, current_movie_theater) for session in element.find_all('div', {'class': 'session'}))
 
     for session in sessions:
         if (
