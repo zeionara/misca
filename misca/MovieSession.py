@@ -12,9 +12,9 @@ class MovieSession:
     def __init__(self, html_content: BeautifulSoup, date: str, theater: MovieTheater):
         self.title = html_content.find_next('div', {'class': 'title'}).getText()
 
-        self.__date_as_string = date
+        self._date_as_string = date
         time = html_content.find_next('div', {'class': 'time'}).get_text()
-        self.__time_as_string = time
+        self._time_as_string = time
 
         date_and_time = f'{date}.{time}'
 
@@ -37,7 +37,7 @@ class MovieSession:
 
     def __str__(self):
         # return f'{self.title} @ {self.room} 📅 {self.__date_as_string} 🕑 {self.__time_as_string} 💰 {self.mean_price}'
-        return f'{self.title:<50} 🌎 {str(self.theater):<50} @ {self.room:<20} 📅 {self.__date_as_string} {"(" + self.time.strftime("%A") + ")":<10} 🕑 {self.__time_as_string} 💰 {", ".join(map(str, self.prices))}'
+        return f'{self.title:<50} 🌎 {str(self.theater):<50} @ {self.room:<20} 📅 {self._date_as_string} {"(" + self.time.strftime("%A") + ")":<15} 🕑 {self._time_as_string} 💰 {", ".join(map(str, self.prices))}'
 
     def __repr__(self):
         return self.__str__()

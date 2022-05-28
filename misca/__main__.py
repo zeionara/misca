@@ -1,5 +1,6 @@
 import click
 
+from .TelegramBot import TelegramBot
 from .schedule_tracer import trace_schedule as trace_schedule_
 
 
@@ -16,6 +17,13 @@ def main():
 def trace_schedule(max_price: int, movie: str, theater: int, ndays: int):
     for session in trace_schedule_(max_price, movie, theater, ndays):
         print(session)
+
+
+@main.command()
+@click.option('--token', '-t', type = str, default = None)
+def start(token: str):
+    bot = TelegramBot(token)
+    bot.run()
 
 
 if __name__ == '__main__':
