@@ -20,9 +20,10 @@ def trace_schedule(max_price: int, movie: str, theater: int, ndays: int):
 
 
 @main.command()
-@click.option('--token', '-t', type = str, default = None)
-def start(token: str):
-    bot = TelegramBot(token)
+@click.option('--token', '-t', type = str)
+@click.option('--subscriber-password', '-sp', type = str, default = None)
+def start(token: str, subscriber_password: str):
+    bot = TelegramBot(token, subscriber_password = subscriber_password)
     bot.run()
 
 
