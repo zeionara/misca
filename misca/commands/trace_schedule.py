@@ -13,7 +13,7 @@ def make_schedule_message(schedule: Tuple[MovieSession], include_header: bool = 
     return ("See what I found:\n\n```\n" if include_header else "```\n") + '\n'.join(
         (f'{truncate(str(session.title), 15):<15} 🌎 ' if include_movie_name else '') +
         f'{truncate(str(session.theater.title), 15):<15} @ {truncate(session.room, 10):<10} 📅 {session._date_as_string} ' +
-        f'{"(" + session.time.strftime("%A") + ")":<10} 🕑 {session._time_as_string} 💰 {", ".join(map(str, session.prices))}'
+        f'{"(" + truncate(session.time.strftime("%A"), 8) + ")":<10} 🕑 {session._time_as_string} 💰 {", ".join(map(str, session.prices))}'
         for session in schedule
     ) + "\n```"
 
