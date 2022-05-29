@@ -99,7 +99,7 @@ class TelegramBot:
     async def send_schedule_updates(self, subscriber_id, max_price):
         sessions_for_subscriber = self.state.get_unseen(subscriber_id, [session for session in self.sessions if session.satisfies_requirements(max_price = max_price)])
 
-        print(len(self.sessions), len(sessions_for_subscriber))
+        print(f'There are {len(self.sessions)} movie sessions, {len(sessions_for_subscriber)} are suitable for showing to {subscriber_id}')
         
         if len(sessions_for_subscriber) > 0:
             is_first_group = True
