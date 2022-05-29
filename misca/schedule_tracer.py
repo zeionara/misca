@@ -44,7 +44,7 @@ def trace_schedule(max_price: float = None, movie: str = None, theater: int = No
         if (
             max_price is None or session.max_price <= max_price
         ) and (
-            movie is None or session.title == movie
+            movie is None or session.title.startswith(movie)
         ) and (
             theater is None or session.theater.id == theater
         ):

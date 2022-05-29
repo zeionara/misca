@@ -1,11 +1,12 @@
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
 
+from ..StateManager import StateManager
 from ..schedule_tracer import trace_schedule
 
 
-async def trace_schedule_for_movie(context: ContextTypes.DEFAULT_TYPE, subscriber_id: str, title: str):
-    schedule = tuple(trace_schedule(movie = title, ndays = 3))
+async def trace_schedule_for_movie(context: ContextTypes.DEFAULT_TYPE, state: StateManager, subscriber_id: str, title: str):
+    schedule = tuple(trace_schedule(movie = title, max_price = state.get_max_ticket_price(subscriber_id), ndays = 3))
 
     if len(schedule) > 0:
         response = "See what I found:\n\n```\n" + '\n'.join(
