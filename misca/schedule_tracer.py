@@ -41,11 +41,5 @@ def trace_schedule(max_price: float = None, movie: str = None, theater: int = No
                 sessions.extend(MovieSession(session, date_as_string, current_movie_theater) for session in element.find_all('div', {'class': 'session'}))
 
     for session in sessions:
-        if (
-            max_price is None or session.max_price <= max_price
-        ) and (
-            movie is None or session.title.startswith(movie)
-        ) and (
-            theater is None or session.theater.id == theater
-        ):
+        if session.satisfies_requirements(max_price = max_price, movie = movie, theater = theater):
             yield session

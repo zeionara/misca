@@ -1,3 +1,6 @@
+import re
+from typing import List
+
 from datetime import datetime
 import math
 from bs4 import BeautifulSoup
@@ -6,11 +9,16 @@ from .MovieTheater import MovieTheater
 
 DATE_PATTERN = '%d.%m.%Y'
 DATE_TIME_PATTERN = f'{DATE_PATTERN}.%H:%M'
+SESSION_ID_PATTERN = re.compile('/ticket/(.*)/')
 
 
 class MovieSession:
     def __init__(self, html_content: BeautifulSoup, date: str, theater: MovieTheater):
         self.title = html_content.find_next('div', {'class': 'title'}).getText()
+
+        link = html_content.a['href']
+        match_ = SESSION_ID_PATTERN.fullmatch(link)
+        self.id = match_.group(1)
 
         self._date_as_string = date
         time = html_content.find_next('div', {'class': 'time'}).get_text()
@@ -34,6 +42,17 @@ class MovieSession:
         self.prices = prices
 
         self.theater = theater
+
+    def satisfies_requirements(self, max_price: int = None, movie: str = None, theater: str = None, movies: List[str] = None):
+        return (
+            max_price is None or self.max_price <= max_price
+        ) and (
+            movie is None or self.title.startswith(movie)
+        ) and (
+            movies is None or any(self.title.startswith(movie) for movie in movies)
+        ) and (
+            theater is None or self.theater.id == theater
+        )
 
     def __str__(self):
         # return f'{self.title} @ {self.room} 📅 {self.__date_as_string} 🕑 {self.__time_as_string} 💰 {self.mean_price}'

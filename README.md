@@ -21,7 +21,7 @@ The output is presented in the following format:
 ### Telegram api
 The tool also can be used via telegram bot api. First, you need to run your server passing an appropriate bot token:
 ```sh
-python -m misca start -t foobar
+python -m misca start -t foo -sp bar
 ```
 And then write the movie title to bot. The bot will fetch available movie sessions from the website and display it to you.
 ![telegram app window screenshot](images/telegram-screenshot.jpg "Telegram app window screenshot with the chat in which user interacted with bot")
